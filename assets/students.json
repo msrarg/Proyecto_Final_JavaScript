@@ -1,0 +1,16 @@
+[
+    {
+        "id":1, 
+        "nombres":"Invitado", 
+        "apellidos":"Invitado",
+        "email":"invitado@hotmail.com",
+        "comentarios":""
+    },
+    {
+        "id":2, 
+        "nombres":"Mauricio Simón", 
+        "apellidos":"Rodriguez",
+        "email":"maurizio_1979_r@hotmail.com",
+        "comentarios":"Comentario"
+    }
+]
