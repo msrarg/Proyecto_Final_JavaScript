@@ -3,18 +3,20 @@
 ///
 import { Alumno, Leccion, Intento } from "./classes.js";
 
-let students = []; // array donde se irán acumulando los estudiantes.
+let students = [];      // array donde se irán acumulando los estudiantes.
 let allLessons    = []; // array donde se guardan todas las lecciones.
 let filterLessons = []; // array donde se guardan todas las lecciones filtradas de la lección en curso.
 let randomLessons = []; // array donde se guardan todas las lecciones filtradas de la lección en curso deseordenadas.
-let attempts = []; // array donde se irán acumulando los intentos al realizar una lección.
+let attempts = [];      // array donde se irán acumulando los intentos al realizar una lección.
 
 let currentWord = 0; // En esta variable guardo la palabra actual de la lección seleccionada.
 let currentStudent;  // En esta variable guardo el alumno seleccionado.
 let currentLesson;   // En esta variable guardo la lección seleccionada.
 let currentAttempt;  // En esta variable guardo el número de intento de una lección.
 
-let darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? false; // Verifico si en el local Storage está almacenada la opción de darkmode.
+// Verifico si en el local Storage está almacenada la opción de darkmode.
+let darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? false;
+
 //
 // Creo e inicializo las variales para interactuar con el DOM
 //
@@ -34,7 +36,7 @@ const $pillsMonthsTab    = document.getElementById('pills-months-tab');
 $formAlumno.addEventListener('submit', (e) => {
   e.preventDefault();
   let datForm = new FormData(e.target);
-  if(validEmail(datForm.get('email')))
+  if(!students.find(element => element.email == datForm.get('email')))
   {
     let maxIndice = 0;
     if (students.length > 0) 
@@ -126,7 +128,7 @@ document.getElementById('btnSiguiente').addEventListener('click', function (e) {
   if (currentWord < randomLessons.length){
     renderWord(currentWord);
   } else {
-    showAlertToastify('exito','Ya no quedan mas preguntas en esta lección.');    
+    showAlertToastify('exito','Ya no quedan mas preguntas en esta lección.');
     let suma = 0;
     let filterAttempt =  [];
     attempts.forEach(intento =>{
@@ -137,12 +139,13 @@ document.getElementById('btnSiguiente').addEventListener('click', function (e) {
     })
     if(filterAttempt.length > 0){
       const porcentaje = ((suma / filterAttempt.length).toFixed(2) * 100);
+      let index = students.findIndex(stu => stu.id == currentStudent);
       if(porcentaje > 70){
-        showSweetAlert('success', `Excelente trabajo ${filterAttempt.alumno}, continua así! porcentaje = ${porcentaje} %`);
+        showSweetAlert('success', `Excelente trabajo ${students[index].getNombresApellidos()}, continua así! porcentaje = ${porcentaje} %`);
       } else if (porcentaje > 50){
-        showSweetAlert('warning', `Muy bién ${filterAttempt.alumno}, continua esforzandote! porcentaje = ${porcentaje} %`);
+        showSweetAlert('warning', `Muy bién ${students[index].getNombresApellidos()}, continua esforzandote! porcentaje = ${porcentaje} %`);
       } else {
-        showSweetAlert('error', `No te fue tan bién ${filterAttempt.alumno}, continua esforzandote! porcentaje = ${porcentaje} %`);
+        showSweetAlert('error', `No te fue tan bién ${students[index].getNombresApellidos()}, continua esforzandote! porcentaje = ${porcentaje} %`);
       }
     }
   }
@@ -151,11 +154,6 @@ document.getElementById('btnSiguiente').addEventListener('click', function (e) {
 /// ----------------------------------------------------------------------------------
 /// FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES  
 /// ----------------------------------------------------------------------------------
-
-// Función que determina en que intento se encuentra un estudiante para una lección .
-const validEmail = (email) => {
-  return students.includes(stu => stu.email === email);
-}
 
 // Función que inicializa la lección seleccionada y la por defecto al cargar la página.
 const initLesson = (nombre) => {
@@ -182,16 +180,17 @@ const calculateAttempt = () => {
       arraytAttempt.push(intento);
     }
   })
-  if (arraytAttempt.length > 0)
-    currentAttempt = (Math.max(...arraytAttempt.attempt) + 1);
-  else
+  if (arraytAttempt.length > 0) {
+   currentAttempt = (Math.max(...arraytAttempt.map(({ attempt }) => attempt)) + 1);
+  } else {
     currentAttempt = 1;
+  }
 }
 
 // Función que se encarga de validar la respuesta seleccionada por el alumno en cada palabra de cada lección.
 const validateChosenWord = (numero) => {
   if(currentStudent != undefined){
-    let intento 
+    let intento;
     let palabra = randomLessons[numero];
     let opcion_elegida = document.querySelector(`input[name="leccionRadio${numero}"]:checked`);
     if (opcion_elegida !== null){
@@ -205,6 +204,7 @@ const validateChosenWord = (numero) => {
         intento = new Intento(currentAttempt, currentStudent, palabra.nombre, opcion_elegida.value, 0);
       }
       attempts.push(intento);
+      console.log(attempts);
     } else {
         showAlertToastify('alerta','Debe seleccionar una opción para poder validar');
     }
