@@ -26,68 +26,6 @@ const $pillsAnimalsTab   = document.getElementById('pills-animals-tab');
 const $pillsColoursTab   = document.getElementById('pills-colours-tab');
 const $pillsMonthsTab    = document.getElementById('pills-months-tab');
 
-///
-///
-///
-
-attempts.push(new Intento (1, students[0], "colours", "blue",   1));
-attempts.push(new Intento (1, students[0], "colours", "brown",  1));
-attempts.push(new Intento (1, students[0], "colours", "green",  1));
-attempts.push(new Intento (1, students[0], "colours", "orange", 1));
-attempts.push(new Intento (1, students[0], "colours", "pink",   1));
-attempts.push(new Intento (1, students[0], "colours", "purple", 1));
-attempts.push(new Intento (1, students[0], "colours", "red",    1));
-attempts.push(new Intento (1, students[0], "colours", "yellow", 1));
-
-attempts.push(new Intento (1, students[1], "colours", "blue",   1));
-attempts.push(new Intento (1, students[1], "colours", "bron",   0));
-attempts.push(new Intento (1, students[1], "colours", "green",  1));
-attempts.push(new Intento (1, students[1], "colours", "orange", 1));
-attempts.push(new Intento (1, students[1], "colours", "pink",   1));
-attempts.push(new Intento (1, students[1], "colours", "purple", 1));
-attempts.push(new Intento (1, students[1], "colours", "red",    1));
-attempts.push(new Intento (1, students[1], "colours", "yellow", 1));
-
-attempts.push(new Intento (1, students[2], "colours", "blue",   1));
-attempts.push(new Intento (1, students[2], "colours", "brown",  1));
-attempts.push(new Intento (1, students[2], "colours", "gren",   0));
-attempts.push(new Intento (1, students[2], "colours", "orange", 1));
-attempts.push(new Intento (1, students[2], "colours", "pink",   1));
-attempts.push(new Intento (1, students[2], "colours", "purple", 1));
-attempts.push(new Intento (1, students[2], "colours", "red",    1));
-attempts.push(new Intento (1, students[2], "colours", "yelow",  0));
-
-attempts.push(new Intento (2, students[2], "colours", "blue",   1));
-attempts.push(new Intento (2, students[2], "colours", "brown",  1));
-attempts.push(new Intento (2, students[2], "colours", "green",  1));
-attempts.push(new Intento (2, students[2], "colours", "orange", 1));
-attempts.push(new Intento (2, students[2], "colours", "pink",   1));
-attempts.push(new Intento (2, students[2], "colours", "purple", 1));
-attempts.push(new Intento (2, students[2], "colours", "red",    1));
-attempts.push(new Intento (2, students[2], "colours", "yellow", 1));
-
-attempts.push(new Intento (1, students[2], "months", "January",   1));
-attempts.push(new Intento (1, students[2], "months", "February",  1));
-attempts.push(new Intento (1, students[2], "months", "March",     1));
-attempts.push(new Intento (1, students[2], "months", "April",     1));
-attempts.push(new Intento (1, students[2], "months", "May",       1));
-attempts.push(new Intento (1, students[2], "months", "June",      1));
-attempts.push(new Intento (1, students[2], "months", "July",      1));
-attempts.push(new Intento (1, students[2], "months", "August",    1));
-attempts.push(new Intento (1, students[2], "months", "September", 1));
-attempts.push(new Intento (1, students[2], "months", "October",   1));
-attempts.push(new Intento (1, students[2], "months", "November",  1));
-attempts.push(new Intento (1, students[2], "months", "December",  1));
-
-attempts.push(new Intento (1, students[3], "colours", "blue",   1));
-attempts.push(new Intento (1, students[3], "colours", "brown",  1));
-attempts.push(new Intento (1, students[3], "colours", "green",  1));
-attempts.push(new Intento (1, students[3], "colours", "orange", 1));
-attempts.push(new Intento (1, students[3], "colours", "pink",   1));
-attempts.push(new Intento (1, students[3], "colours", "porple", 0));
-attempts.push(new Intento (1, students[3], "colours", "red",    1));
-attempts.push(new Intento (1, students[3], "colours", "yellow", 1));
-
 /// ----------------------------------------------------------------------------------
 /// Modificación del DOM y detección de eventos de usuario.
 /// ----------------------------------------------------------------------------------
@@ -138,7 +76,7 @@ $btnMostrarAlumnos.addEventListener('click', () => {
     // Programo el evento click en el botón de Seleccionar Alumno.
     students.forEach((alumno) => {
       document.getElementById(`btnSeleccionarAlumno${alumno.id}`).addEventListener('click', () => {
-        currentStudent = alumno;
+        currentStudent = alumno.id; 
       })
     })
     // Programo el evento click en el botón de Eliminar Alumno.
@@ -178,12 +116,33 @@ document.getElementById('btnValidar').addEventListener('click', function (e) {
 
 //Evento que se ejecuta para avanzar de leccion
 document.getElementById('btnSiguiente').addEventListener('click', function (e) {
-  // Se incrementa el leccion actual para poder dibujar la tarjeta y para no dejar avanzar mas de los lessons posibles
+  // Se incrementa la leccion actual para poder dibujar la tarjeta y para no dejar avanzar mas allá de las lecciones posibles.
   currentWord++;
   if (currentWord < randomLessons.length){
     renderWord(currentWord);
   } else {
-    showAlertToastify('exito','Ya no quedan mas preguntas en esta lección.');
+    showAlertToastify('exito','Ya no quedan mas preguntas en esta lección.');    
+    let suma = 0;
+    let filterAttempt =  [];
+    attempts.forEach(intento =>{
+      if(intento.attempt == currentAttempt && intento.alumno == currentStudent && intento.lesson == currentLesson){
+        filterAttempt.push(intento);
+        suma += intento.value;
+      }
+    })
+    if(filterAttempt.length > 0){
+      console.log(suma);
+      console.log(filterAttempt.length);
+      console.log((suma / filterAttempt.length).toFixed(2));
+      const porcentaje = ((suma / filterAttempt.length).toFixed(2) * 100);
+      if(porcentaje > 70){
+        showSweetAlert('success', `Excelente trabajo, continua así! porcentaje = ${porcentaje} %`);
+      } else if (porcentaje > 50){
+        showSweetAlert('warning', `Muy bién, continua esforzandote! porcentaje = ${porcentaje} %`);
+      } else {
+        showSweetAlert('error', `no te fue tan bién, continua esforzandote! porcentaje = ${porcentaje} %`);
+      }
+    }
   }
 })
 
@@ -208,24 +167,23 @@ const initLesson = (nombre) => {
   calculateAttempt();
 }
 
-// Función que inicializa la lección seleccionada y la por defecto al cargar la página.
+// Función que determina en que intento se encuentra un estudiante para una lección .
 const calculateAttempt = () => {
-  console.log(currentLesson);
-  console.log(currentStudent);
-  let arraytAttempt = attempts.filter((less, stu) => {less.nombre == currentLesson && stu.id == currentStudent.id} ); // Filtro de todas las lecciones la seleccionada
-  console.log(arraytAttempt);
-  console.log(arraytAttempt.length);
+  let arraytAttempt = [];
+  attempts.forEach(intento =>{
+    if(intento.alumno == currentStudent && intento.lesson == currentLesson){
+      arraytAttempt.push(intento);
+    }
+  })
   if (arraytAttempt.length > 0)
-    // currentAttempt = arraytAttempt[0].attempt + 1;
-    currentAttempt = (Math.max(...arraytAttempt) + 1);
+    currentAttempt = (Math.max(...arraytAttempt.attempt) + 1);
   else
     currentAttempt = 1;
-  console.log(currentAttempt);
 }
 
 // Función que se encarga de validar la respuesta seleccionada por el alumno en cada palabra de cada lección.
 const validateChosenWord = (numero) => {
-  if(currentStudent){
+  if(currentStudent != undefined){
     let intento 
     let palabra = randomLessons[numero];
     let opcion_elegida = document.querySelector(`input[name="leccionRadio${numero}"]:checked`);
@@ -244,7 +202,7 @@ const validateChosenWord = (numero) => {
         showAlertToastify('alerta','Debe seleccionar una opción para poder validar');
     }
   }else{
-    swal("ALUMNOS REGISTRADOS", "No hay un alumno seleccionado para continuar.");
+    swal("ALUMNO SELECCIONADO", "No hay un alumno seleccionado para continuar.");
   }
 }
 
@@ -341,6 +299,23 @@ const renderWord = (numero) => {
 //
 // Esta función se encarga de mostrar el alerta utilizando la librería de Toastify
 //
+const showSweetAlert = (tipo, texto) => {
+  switch(tipo){
+    case 'success':
+      swal("Excellent, good job!", texto, tipo);
+      break;
+    case 'warning':
+      swal("Keep getting better!", texto, tipo);
+      break;
+    case 'error':
+      swal("Oops something went wrong!", texto, tipo);
+      break;
+  }
+}
+
+//
+// Esta función se encarga de mostrar el alerta utilizando la librería de Toastify
+//
 const showAlertToastify = (tipo, texto) => {
   let background = '';
   if (tipo === 'exito'){
@@ -365,7 +340,7 @@ const showAlertToastify = (tipo, texto) => {
 }
 
 //Función que cargar las lecciones filtradas por tema (Animals / Colours / Months)
- const loadLessons = async (path) => {
+const loadLessons = async (path) => {
   const response = await fetch(path);
   const jsonLessons = await response.json();
   jsonLessons.forEach(less => {
