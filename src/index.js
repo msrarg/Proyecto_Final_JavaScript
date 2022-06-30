@@ -1,7 +1,7 @@
 ///
 /// VARIABLES - CLASES - OBJETOS - IMPORT
 ///
-import { Alumno, Leccion, Intento } from "./src/classes.js";
+import { Alumno, Leccion, Intento } from "./classes.js";
 
 let students = []; // array donde se irán acumulando los estudiantes.
 let allLessons    = []; // array donde se guardan todas las lecciones.
@@ -34,23 +34,28 @@ const $pillsMonthsTab    = document.getElementById('pills-months-tab');
 $formAlumno.addEventListener('submit', (e) => {
   e.preventDefault();
   let datForm = new FormData(e.target);
-  let maxIndice = 0;
-  if (students.length > 0) 
-    maxIndice = Math.max(...students.map(alumno => alumno.id));
-  maxIndice++;
-  let alumno = new Alumno(maxIndice, datForm.get('nombres'), datForm.get('apellidos'), datForm.get('email'), datForm.get('comentario'));
-  students.push(alumno);
-  localStorage.setItem('alumnos', JSON.stringify(students)); // Almacenar datos (clave-valor) en el Storage y recuperarlos.
-  $formAlumno.reset();
-  Toastify({
-      text: "El alumno ha sido registrado.",
-      duration: 3000,
-      gravity: "top",
-      position: "right",
-      style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-        }
-    }).showToast();
+  if(validEmail(datForm.get('email')))
+  {
+    let maxIndice = 0;
+    if (students.length > 0) 
+      maxIndice = Math.max(...students.map(alumno => alumno.id));
+    maxIndice++;
+    let alumno = new Alumno(maxIndice, datForm.get('nombres'), datForm.get('apellidos'), datForm.get('email'), datForm.get('comentario'));
+    students.push(alumno);
+    localStorage.setItem('alumnos', JSON.stringify(students)); // Almacenar datos (clave-valor) en el Storage y recuperarlos.
+    $formAlumno.reset();
+    Toastify({
+        text: "El alumno ha sido registrado.",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+          }
+      }).showToast();
+  } else {
+    showSweetAlert('error', `Ya existe otro alumno registrado con este email.`);
+  }
 })
 
 // Programo el evento click en el botón btnMostrarAlumnos del formAlumno. Ingreso los datos de un alumno nuevo al array students[] mediante el método push.
@@ -131,16 +136,13 @@ document.getElementById('btnSiguiente').addEventListener('click', function (e) {
       }
     })
     if(filterAttempt.length > 0){
-      console.log(suma);
-      console.log(filterAttempt.length);
-      console.log((suma / filterAttempt.length).toFixed(2));
       const porcentaje = ((suma / filterAttempt.length).toFixed(2) * 100);
       if(porcentaje > 70){
-        showSweetAlert('success', `Excelente trabajo, continua así! porcentaje = ${porcentaje} %`);
+        showSweetAlert('success', `Excelente trabajo ${filterAttempt.alumno}, continua así! porcentaje = ${porcentaje} %`);
       } else if (porcentaje > 50){
-        showSweetAlert('warning', `Muy bién, continua esforzandote! porcentaje = ${porcentaje} %`);
+        showSweetAlert('warning', `Muy bién ${filterAttempt.alumno}, continua esforzandote! porcentaje = ${porcentaje} %`);
       } else {
-        showSweetAlert('error', `no te fue tan bién, continua esforzandote! porcentaje = ${porcentaje} %`);
+        showSweetAlert('error', `No te fue tan bién ${filterAttempt.alumno}, continua esforzandote! porcentaje = ${porcentaje} %`);
       }
     }
   }
@@ -149,6 +151,11 @@ document.getElementById('btnSiguiente').addEventListener('click', function (e) {
 /// ----------------------------------------------------------------------------------
 /// FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES - FUNCIONES  
 /// ----------------------------------------------------------------------------------
+
+// Función que determina en que intento se encuentra un estudiante para una lección .
+const validEmail = (email) => {
+  return students.includes(stu => stu.email === email);
+}
 
 // Función que inicializa la lección seleccionada y la por defecto al cargar la página.
 const initLesson = (nombre) => {
@@ -364,11 +371,12 @@ const switchDarkMode = (checkedDarkMode) => {
 
 // Función inicial
 window.addEventListener("DOMContentLoaded", (event) => {
-
-  // VER SI BORRO -- VER SI BORRO -- VER SI BORRO
-  // Implementación con uso de JSON y Storage.
+  // Implementación con uso de JSON y local Storage.
   if(localStorage.getItem('alumnos')){
-    // students = JSON.parse(localStorage.getItem('alumnos'));
+    let alumnos = JSON.parse(localStorage.getItem('alumnos'));
+    alumnos.forEach(alumno => {
+      students.push(new Alumno(alumno.id, alumno.nombres, alumno.apellidos, alumno.email, alumno.comentario));
+    })  
   } else {
     localStorage.setItem('alumnos', JSON.stringify(students))
   }
